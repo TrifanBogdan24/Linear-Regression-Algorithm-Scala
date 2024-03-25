@@ -29,26 +29,24 @@ class Dataset(m: List[List[String]]) {
       new Dataset(selectedData)
     }
   }
-  @tailrec
-  private def splitHelper(remaining: List[List[String]], targetSize: Int, accTrain: List[List[String]], accTest: List[List[String]]): (Dataset, Dataset) = {
-    remaining match {
-      case Nil => (Dataset(accTrain.reverse), Dataset(accTest.reverse))
-      case head :: tail =>
-        if (accTest.length < targetSize) {
-          splitHelper(tail, targetSize, accTrain, head :: accTest)
-        } else {
-          splitHelper(tail, targetSize, head :: accTrain, accTest)
-        }
-    }
-  }
+
 
   def split(percentage: Double): (Dataset, Dataset) = {
-    require(percentage > 0 && percentage <= 0.5, "Percentage must be between 0 and 0.5")
+    if (percentage < 0 || percentage > 0.5) {
+      throw new IllegalArgumentException("Percentage must be between 0 and 0.5")
+    }
 
-    val sortedData = m.sortBy(_.head) // Sortăm după prima coloană
-    val dataSize = sortedData.length
-    val testSize = (dataSize * percentage).toInt
-    splitHelper(sortedData, testSize, Nil, Nil)
+    val sortedData = data.sortBy(_.head)
+
+    val splitIndex = (percentage * size).toInt
+
+    val testData = sortedData.take(splitIndex)
+    val trainData = sortedData.drop(splitIndex)
+
+    val testDataset = new Dataset(testData)
+    val trainDataset = new Dataset(trainData)
+
+    (trainDataset, testDataset)
   }
 
   def size: Int = m.length
