@@ -1,5 +1,6 @@
 import scala.annotation.tailrec
 import scala.io.Source    // ciitirea din fisier CSV
+
 class Dataset(m: List[List[String]]) {
   val data: List[List[String]] = m
   override def toString: String = {
@@ -33,7 +34,7 @@ class Dataset(m: List[List[String]]) {
 
   def split(percentage: Double): (Dataset, Dataset) = {
     if (percentage < 0 || percentage > 0.5) {
-      throw new IllegalArgumentException("Percentage must be between 0 and 0.5")
+      throw new Exception("Percentage must be between 0 and 0.5")
     }
 
     val sortedData = data.sortBy(_.head)

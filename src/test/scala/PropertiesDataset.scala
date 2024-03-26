@@ -95,26 +95,51 @@ object PropertiesDataset {
 
   object PropertiesSplit extends DatasetGenProperty("Split") {
 
-    /* Aceasta proprietate testeaza metoda split.
-      * Se alege un factor aleator nenul intre 0 si 1.
-      * Se imparte datasetul in doua dataseturi, ds1 si ds2, cu factorul ales.
-      * Se verifica daca ds1 si ds2 au toate proprietatile urmatoare:
-      * - suma dimensiunilor ds1 si ds2 este egala cu dimensiunea datasetului initial
-      * - dimensiunea ds2 este egala cu dimensiunea datasetului initial inmultita cu factorul ales
-      * - ds1 si ds2 contin linii care se regasesc in datasetul initial
-      * - concatenand liniile din ds1 si ds2, se obtine datasetul initial, ordonat dupa prima coloana
-      * - ds1 si ds2 au acelasi header ca si datasetul initial
-     */
-    property("split") = forAll { (ds: Dataset) =>
-      var factor = 0.0
-      while factor == 0 do factor = Random.nextDouble() / 2
+    property("split - 20 entries") = {
+      val ds = Dataset.apply(List("col1", "col2")::((0 until 20).toList.map(e => List(e.toString, e.toString))))
+      val factor = 0.2
       val (ds1, ds2) = ds.split(factor)
-      ds1.size + ds2.size == ds.size && ds2.size == (ds.size * factor).toInt &&
-        ds1.data.forall(row => ds.data.exists(_.sameElements(row))) &&
-        ds2.data.forall(row => ds.data.exists(_.sameElements(row))) &&
-        ds1.getHeader == ds.getHeader && ds2.getHeader == ds.getHeader &&
-        ds1.data.tail ++ ds2.data.tail == ds.data.tail.sortBy(_.head) // tail ca sa scapam de numele coloanelor
+
+      ds2.data == List(List("col1", "col2"), List("12", "12"), List("17", "17"), List("4", "4"), List("9", "9")) &&
+        ds1.data == List(List("col1", "col2"), List("0", "0"), List("1", "1"), List("10", "10"), List("11", "11"), List("13", "13"),
+          List("14", "14"), List("15", "15"), List("16", "16"), List("18", "18"), List("19", "19"), List("2", "2"),
+          List("3", "3"), List("5", "5"), List("6", "6"), List("7", "7"), List("8", "8"))
     }
+
+    property("split - 120 entries") = {
+      val ds = Dataset.apply(List("col1", "col2")::((0 until 120).toList.map(e => List(e.toString, e.toString))))
+      val factor = 0.3
+      val (ds1, ds2) = ds.split(factor)
+
+      ds1.data == List(List("col1", "col2"), List("0", "0"), List("1", "1"), List("10", "10"),
+        List("101", "101"), List("102", "102"), List("103", "103"), List("105", "105"),
+        List("106", "106"), List("107", "107"), List("109", "109"), List("11", "11"),
+        List("110", "110"), List("112", "112"), List("113", "113"), List("114", "114"),
+        List("116", "116"), List("117", "117"), List("118", "118"), List("12", "12"),
+        List("13", "13"), List("14", "14"), List("16", "16"), List("17", "17"), List("18", "18"),
+        List("2", "2"), List("20", "20"), List("21", "21"), List("23", "23"), List("24", "24"),
+        List("25", "25"), List("27", "27"), List("28", "28"), List("29", "29"), List("30", "30"),
+        List("31", "31"), List("32", "32"), List("34", "34"), List("35", "35"), List("36", "36"),
+        List("38", "38"), List("39", "39"), List("4", "4"), List("41", "41"), List("42", "42"),
+        List("43", "43"), List("45", "45"), List("46", "46"), List("47", "47"), List("49", "49"),
+        List("5", "5"), List("50", "50"), List("52", "52"), List("53", "53"), List("54", "54"),
+        List("56", "56"), List("57", "57"), List("58", "58"), List("6", "6"), List("60", "60"),
+        List("61", "61"), List("63", "63"), List("64", "64"), List("65", "65"), List("67", "67"),
+        List("68", "68"), List("69", "69"), List("70", "70"), List("71", "71"), List("72", "72"),
+        List("74", "74"), List("75", "75"), List("76", "76"), List("78", "78"), List("79", "79"),
+        List("8", "8"), List("81", "81"), List("82", "82"), List("83", "83"), List("85", "85"),
+        List("86", "86"), List("87", "87"), List("89", "89"), List("9", "9"), List("90", "90"),
+        List("92", "92"), List("93", "93"), List("94", "94"), List("96", "96"), List("97", "97"),
+        List("98", "98")) &&
+      ds2.data == List(List("col1", "col2"), List("100", "100"), List("104", "104"),
+        List("108", "108"), List("111", "111"), List("115", "115"), List("119", "119"),
+        List("15", "15"), List("19", "19"), List("22", "22"), List("26", "26"), List("3", "3"),
+        List("33", "33"), List("37", "37"), List("40", "40"), List("44", "44"), List("48", "48"),
+        List("51", "51"), List("55", "55"), List("59", "59"), List("62", "62"), List("66", "66"),
+        List("7", "7"), List("73", "73"), List("77", "77"), List("80", "80"), List("84", "84"),
+        List("88", "88"), List("91", "91"), List("95", "95"), List("99", "99"))
+    }
+
   }
 
   def runProperties(properties: Properties): Boolean = {
