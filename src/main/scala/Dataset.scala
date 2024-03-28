@@ -33,21 +33,45 @@ class Dataset(m: List[List[String]]) {
 
 
   def split(percentage: Double): (Dataset, Dataset) = {
+    // TODO: split function nu trece testele
     if (percentage < 0 || percentage > 0.5) {
-      throw new Exception("Percentage must be between 0 and 0.5")
+      throw new IllegalArgumentException("ce procent e asta?")
     }
 
-    val sortedData = data.sortBy(_.head)
+    // sortam liniile matricii (mai putin prima)
+    val sortedData: List[List[String]] = m.tail.sortBy(
+      row => row.head      // crescator dupa prima coloana (strcmp)
+    )
 
-    val splitIndex = (percentage * size).toInt
 
-    val testData = sortedData.take(splitIndex)
-    val trainData = sortedData.drop(splitIndex)
 
-    val testDataset = new Dataset(testData)
-    val trainDataset = new Dataset(trainData)
+    val nrElementsSubSet: Int = (1.0.toDouble / percentage).ceil.toInt
 
-    (trainDataset, testDataset)
+    @tailrec
+    def splitHelper(inputValues: List[List[String]],
+               trainValues: List[List[String]],
+               evalValues: List[List[String]],
+               k: Int)
+                : (List[List[String]], List[List[String]]) = {
+
+      inputValues match {
+        case Nil => (trainValues, evalValues)
+        case x :: xs => {
+          if (k == nrElementsSubSet)
+            splitHelper(xs, trainValues, evalValues :+ x, 1)
+          else
+            splitHelper(xs, trainValues :+ x, evalValues, k + 1)
+        }
+      }
+
+    }
+
+
+    val (trainValues, evalValues) = splitHelper(sortedData, List(), List(), 1)
+    val trainData = m.head :: trainValues
+    val evalData = m.head :: evalValues
+
+    (new Dataset(trainData), new Dataset(evalData))
   }
 
   def size: Int = m.length
@@ -63,8 +87,8 @@ object Dataset {
     val source = Source.fromFile(csvFilename)
     try {
       val lines = source.getLines().toList
-      val header = lines.head.split(";,").toList
-      val data = lines.tail.map(_.split(";,").toList)
+      val header = lines.head.split(",").toList
+      val data = lines.tail.map(_.split(",").toList)
       new Dataset(data)
     } finally {
       source.close()
