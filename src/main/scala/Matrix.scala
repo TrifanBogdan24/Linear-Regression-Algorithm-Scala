@@ -18,6 +18,9 @@ class Matrix(m: Option[List[List[Double]]]) {
     }
   }
 
+  /**
+   * operatia de inmultie a doua matrici
+   */
   def *(other: Matrix): Matrix = {
     m match {
       case Some(data1) =>
@@ -35,6 +38,10 @@ class Matrix(m: Option[List[List[Double]]]) {
     }
   }
 
+  /**
+   * adaugarea unei coloane la sfarsitul matricii
+   * coloana va contine o constanta (un scalar)
+   */
   def ++(x: Double): Matrix = {
     m match {
       case Some(data) =>
@@ -70,6 +77,16 @@ class Matrix(m: Option[List[List[Double]]]) {
     case Some(data) => data.map(_.mkString(" ")).mkString("\n")
     case None => "Matrix(None)"
   }
+
+
+  /**
+   *
+   * @return  un tuplu ce contine
+   *          inaltimea (numarul de linii)
+   *          latimea (numarul de coloane)
+   */
+  def getDimensions(): (Int, Int) = (height.getOrElse(0), width.getOrElse(0))
+
 }
 
 object Matrix {

@@ -11,29 +11,36 @@ class Dataset(m: List[List[String]]) {
 
 
   def selectColumn(col: String): Dataset =  {
-    val columnIndex = getHeader.indexOf(col)
-    if (columnIndex == -1) {
-      throw new Exception(s"Column '$col' does not exist")
-    } else {
-      val selectedData = getRows.map(row => List(row(columnIndex)))
-      new Dataset(selectedData)
-    }
+    val header = getHeader
+    val columnIdx = header.indexOf(col)
+    if (columnIdx != -1) {
+      val newM = m.map(row => List(row(columnIdx)))
+      new Dataset(newM)
+    } else
+      throw new Exception(s"Coloana $col nu există în setul de date.")
   }
 
   def selectColumns(cols: List[String]): Dataset = {
-    val columnIndices = cols.map(col => getHeader.indexOf(col))
-    if (columnIndices.exists(_ == -1)) {
-      val invalidColumns = cols.filterNot(getHeader.contains)
-      throw new Exception(s"Columns do not exist: ${invalidColumns.mkString(", ")}")
+    val header = getHeader
+    val columnIndices = cols.map(col => header.indexOf(col))
+    if (columnIndices.contains(-1)) {
+      throw new Exception(s"Err: Una sau mai multe coloane specificate nu există în setul de date.")
     } else {
-      val selectedData = getRows.map(row => columnIndices.map(row))
-      new Dataset(selectedData)
+      val newDS = m.map(row => columnIndices.map(index => row(index)))
+      new Dataset(newDS)
     }
   }
 
 
+  /**
+   *
+   * @param percentage    `1 / percentage`` = numarul de elemente dintr-un subset
+   *                      la fiecare `1 / percentage` elemente
+   *                      primele `1 / percentage - 1` se duc in setul de antrenare
+   *                      ia utlimul, al `1 / percentage`-lea element se duce in setul de evaluare
+   * @return              trainDataset, evalDataset
+   */
   def split(percentage: Double): (Dataset, Dataset) = {
-    // TODO: split function nu trece testele
     if (percentage < 0 || percentage > 0.5) {
       throw new IllegalArgumentException("ce procent e asta?")
     }
@@ -43,8 +50,7 @@ class Dataset(m: List[List[String]]) {
       row => row.head      // crescator dupa prima coloana (strcmp)
     )
 
-
-
+    
     val nrElementsSubSet: Int = (1.0.toDouble / percentage).ceil.toInt
 
     @tailrec
@@ -66,7 +72,6 @@ class Dataset(m: List[List[String]]) {
 
     }
 
-
     val (trainValues, evalValues) = splitHelper(sortedData, List(), List(), 1)
     val trainData = m.head :: trainValues
     val evalData = m.head :: evalValues
@@ -74,22 +79,32 @@ class Dataset(m: List[List[String]]) {
     (new Dataset(trainData), new Dataset(evalData))
   }
 
+  /**
+   * numarul de linii al matricii
+   */
   def size: Int = m.length
 
-  def getRows: List[List[String]] = m
+  /**
+   * extrage toate liniile, mai putin prima
+   * va extrage valorile efective din Dataset
+   * */
+  def getRows: List[List[String]] = m.tail
 
 
-  def getHeader: List[String] = m.headOption.getOrElse(Nil)
+  /**
+   * extrage prima linie, denumirile coloanelor
+   */
+  def getHeader: List[String] = m.head
 }
 
 object Dataset {
   def apply(csvFilename: String): Dataset = {
     val source = Source.fromFile(csvFilename)
     try {
-      val lines = source.getLines().toList
-      val header = lines.head.split(",").toList
-      val data = lines.tail.map(_.split(",").toList)
-      new Dataset(data)
+      val lines: List[String] = source.getLines().toList
+      val header: List[String] = lines.head.split(",").toList
+      val data: List[List[String]] = lines.tail.map(_.split(",").toList)
+      new Dataset(header :: data)
     } finally {
       source.close()
     }
