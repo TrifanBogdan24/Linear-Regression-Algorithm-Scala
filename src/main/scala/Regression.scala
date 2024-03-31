@@ -73,15 +73,13 @@ object Regression {
     // 3.5 calculul errorii
     // vedem cat de bine trece dreapta prin punctele de evaluare
     val X_eval: Matrix = Matrix(evalX)
+    val X_eval_expended = fillX(X_eval, W_final)
     val Y_real_eval: Matrix = Matrix(evalY)
-    val Y_predictie: Matrix = X_eval * W_final
 
-    val error_value: Double = {
-      Regression.sumAbsDiff(Y_real_eval, Y_predictie) match {
-        case None => 0
-        case Some(err_val) => err_val
-      }
-    }
+
+    val Y_predictie: Matrix = X_eval_expended * W_final
+
+    val error_value: Double = Regression.sumAbsDiff(Y_real_eval, Y_predictie)
 
 
     (W_final, error_value)
@@ -89,18 +87,60 @@ object Regression {
 
 
 
+  def fillX(X: Matrix, W: Matrix): Matrix = {
+    val XData = X.data.getOrElse(List.empty)
+    val WData = W.data.getOrElse(List.empty)
 
-  def sumAbsDiff(Y_real: Matrix, Y_estimat: Matrix): Option[Double] = {
-    (Y_real.data, Y_estimat.data) match {
-      case (Some(data1), Some(data2)) if data1.size == data2.size && data1.headOption.exists(_.size == data2.headOption.fold(false)(_.size)) =>
-        val differences = data1.zip(data2).flatMap { case (row1, row2) =>
-          row1.zip(row2).map { case (elem1, elem2) =>
-            Math.abs(elem1 - elem2)
-          }
-        }
-        Some(differences.reduce(_ + _))
-      case _ => None
+    val l: Int = XData.length
+    val c: Int = X.width.getOrElse(0)
+    val m: Int = WData.length
+
+    if (c >= m) {
+      X
+    } else {
+      // umplem coloanele din dreapta ca sa puten inmulti X cu W
+      val filledColumns = List.fill(l)(List.fill(m - c)(0.0))
+      val newData = XData.zip(filledColumns).map { case (rowX, rowZero) => rowX ++ rowZero }
+      Matrix(Some(newData))
     }
+  }
+
+
+  def sumAbsDiff(A_matrix: Matrix, B_matrix: Matrix): Double = {
+
+    @tailrec
+    def helper(A: List[List[Double]], B: List[List[Double]], sum: Double): Double = {
+      (A, B) match {
+        case (Nil, Nil) => sum
+
+        case (lin1 :: linesA, lin2 :: linesB) => {
+          val sumOfLines: Double = helper_for_line(lin1, lin2, 0.0)
+          helper(linesA, linesB, sum + sumOfLines)
+        }
+
+        case _ => -1.0
+      }
+    }
+
+
+
+    @tailrec
+    def helper_for_line(lineA: List[Double], lineB: List[Double], sum: Double): Double = {
+      (lineA, lineB) match {
+        case (Nil, Nil) => sum
+        case (a :: xa, b :: xb) => helper_for_line(xa, xb, sum + Math.abs(a - b))
+        case _ => -1.0
+      }
+    }
+
+
+    // conversia la o matrice de `Double`
+    val A_mat: List[List[Double]] = A_matrix.data.getOrElse(List.empty)
+    val B_mat: List[List[Double]] = B_matrix.data.getOrElse(List.empty)
+
+
+
+    helper(A_mat, B_mat, 0.0)
   }
 
   def main(args: Array[String]): Unit = {

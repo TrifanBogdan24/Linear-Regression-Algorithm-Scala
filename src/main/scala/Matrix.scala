@@ -25,12 +25,12 @@ class Matrix(m: Option[List[List[Double]]]) {
     m match {
       case Some(data1) =>
         other.data match {
-          case Some(data2) if data1.headOption.forall(_.length == data2.length) =>
-            val result = data1.map { row1 =>
-              data2.transpose.map { col2 =>
+          case Some(data2) if data1.headOption.exists(_.length == data2.length) =>
+            val result = data1.map(row1 =>
+              data2.transpose.map(col2 =>
                 row1.zip(col2).map { case (a, b) => a * b }.sum
-              }
-            }
+              )
+            )
             Matrix(Some(result))
           case _ => Matrix(None)
         }
