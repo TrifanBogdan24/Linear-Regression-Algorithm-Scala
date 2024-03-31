@@ -12,6 +12,9 @@ object Regression {
     // 3.1 Incarcarea si selectia datelor
     val ds: Dataset = Dataset.apply(dataset_file)
 
+    val (trainSet, evalSet) = ds.split(test_percentage)
+
+
     val selectedX: Dataset = ds.selectColumns(attribute_columns)
     val selectedY: Dataset = ds.selectColumn(value_column)
 
@@ -44,18 +47,15 @@ object Regression {
     def gradient_heleper(W_step: Matrix, current_step: Int): Matrix = {
       if (current_step <= 0) W_step
       else {
-        // TODO: cerunta 4
+        // TODO: cerinta 4
         // X -> matrice m * (n + 1)
         // W_step -> matrice (n + 1) * 1
 
         // Y_estimat -> matrice m * 1
         val Y_estimat_train: Matrix = X * W_step
 
-
         // err -> matrice m * 1
-        val err_vector: Matrix = Y_real_train - Y_estimat_train
-
-
+        val err_vector: Matrix = (Y_real_train - Y_estimat_train).map(el => Math.abs(el))
 
         // gradient -> matrice (n + 1) * 1
         val gradient: Matrix = (X.transpose * err_vector).map(el => el / m.toDouble)
@@ -73,37 +73,18 @@ object Regression {
     // 3.5 calculul errorii
     // vedem cat de bine trece dreapta prin punctele de evaluare
     val X_eval: Matrix = Matrix(evalX)
-    val X_eval_expended = fillX(X_eval, W_final)
     val Y_real_eval: Matrix = Matrix(evalY)
 
 
-    val Y_predictie: Matrix = X_eval_expended * W_final
+    val Y_predictie: Matrix = (X_eval ++ 1) * W_final
 
     val error_value: Double = Regression.sumAbsDiff(Y_real_eval, Y_predictie)
-
 
     (W_final, error_value)
   }
 
 
 
-  def fillX(X: Matrix, W: Matrix): Matrix = {
-    val XData = X.data.getOrElse(List.empty)
-    val WData = W.data.getOrElse(List.empty)
-
-    val l: Int = XData.length
-    val c: Int = X.width.getOrElse(0)
-    val m: Int = WData.length
-
-    if (c >= m) {
-      X
-    } else {
-      // umplem coloanele din dreapta ca sa puten inmulti X cu W
-      val filledColumns = List.fill(l)(List.fill(m - c)(0.0))
-      val newData = XData.zip(filledColumns).map { case (rowX, rowZero) => rowX ++ rowZero }
-      Matrix(Some(newData))
-    }
-  }
 
 
   def sumAbsDiff(A_matrix: Matrix, B_matrix: Matrix): Double = {
