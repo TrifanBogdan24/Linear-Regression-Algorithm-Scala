@@ -6,3 +6,15 @@ archive:
 	cp $(archive_name).zip ~/Downloads/
 
 zip: archive
+
+plot:
+	gnuplot -p plot.plt
+
+install-plot:
+	sudo apt-get install gnuplot
+
+get-plot-version:
+	which gnuplot
+	gnuplot --version
+
+

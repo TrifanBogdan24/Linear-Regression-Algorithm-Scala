@@ -5,7 +5,7 @@
 # which gnuplot
 # gnuplot --version
 #
-# gnuplot plot.plt -p
+# gnuplot -p plot.plt
 
 set datafile separator ","
 set xlabel "YearBuilt"
