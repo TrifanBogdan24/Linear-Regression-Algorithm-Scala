@@ -22,6 +22,7 @@ class Dataset(m: List[List[String]]) {
 
   def selectColumns(cols: List[String]): Dataset = {
     val header = getHeader
+
     val columnIndices = cols.map(col => header.indexOf(col))
     if (columnIndices.contains(-1)) {
       throw new Exception(s"Err: Una sau mai multe coloane specificate nu există în setul de date.")

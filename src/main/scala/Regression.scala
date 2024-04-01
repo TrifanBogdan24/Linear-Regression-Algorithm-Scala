@@ -12,11 +12,13 @@ object Regression {
     // 3.1 Incarcarea si selectia datelor
     val ds = Dataset.apply(dataset_file)
 
-    val datasetX = ds.selectColumns(attribute_columns)
+    val datasetX = ds.selectColumns(attribute_columns.sorted)
     val datasetY = ds.selectColumn(value_column)
 
     val (trainDS_X, evalDS_X) = datasetX.split(test_percentage)
     val (trainDS_Y, evalDS_Y) = datasetY.split(test_percentage)
+
+
 
     // 3.2 Crearea matricii de antrenare X
     // le vom folosi pentru calculul vectorului `W`
@@ -46,7 +48,7 @@ object Regression {
         val Y_estimat: Matrix = X_train_mat * W_step
 
         // err -> matrice m * 1
-        val err_vec: Matrix = (Y_estimat - Y_train).map(el => el.abs)
+        val err_vec: Matrix = (Y_estimat - Y_train) // pentru valori in modul .map(_.abs)
 
         // gradient -> matrice (n + 1) * 1
         val gradient: Matrix = (X_train_mat.transpose * err_vec).map(el => el / m.toDouble)
@@ -78,8 +80,6 @@ object Regression {
 
 
 
-
-
   def sumAbsDiff(A_matrix: Matrix, B_matrix: Matrix): Double = {
 
     @tailrec
@@ -92,7 +92,7 @@ object Regression {
           helper(linesA, linesB, sum + sumOfLines)
         }
 
-        case _ => -1.0
+        case _ => -1.0    // matricile au dimensiuni diferite / invalide
       }
     }
 
@@ -103,7 +103,7 @@ object Regression {
       (lineA, lineB) match {
         case (Nil, Nil) => sum
         case (a :: xa, b :: xb) => helper_for_line(xa, xb, sum + Math.abs(a - b))
-        case _ => -1.0
+        case _ => -1.0    // matricile au dimensiuni diferite / invalide
       }
     }
 
@@ -111,7 +111,6 @@ object Regression {
     // conversia la o matrice de `Double`
     val A_mat: List[List[Double]] = A_matrix.data.getOrElse(List.empty)
     val B_mat: List[List[Double]] = B_matrix.data.getOrElse(List.empty)
-
 
 
     helper(A_mat, B_mat, 0.0)
