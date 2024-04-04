@@ -17,7 +17,7 @@ class Dataset(m: List[List[String]]) {
       val newM = m.map(row => List(row(columnIdx)))
       new Dataset(newM)
     } else
-      throw new Exception(s"Coloana $col nu există în setul de date.")
+      throw new Exception(s"Coloana $col nu exista in setul de date.")
   }
 
   def selectColumns(cols: List[String]): Dataset = {
@@ -25,7 +25,7 @@ class Dataset(m: List[List[String]]) {
 
     val columnIndices = cols.map(col => header.indexOf(col))
     if (columnIndices.contains(-1)) {
-      throw new Exception(s"Err: Una sau mai multe coloane specificate nu există în setul de date.")
+      throw new Exception(s"Err: Una sau mai multe coloane specificate nu exista în setul de date.")
     } else {
       val newDS = m.map(row => columnIndices.map(index => row(index)))
       new Dataset(newDS)
