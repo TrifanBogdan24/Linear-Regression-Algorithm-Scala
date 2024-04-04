@@ -6,7 +6,17 @@ class Matrix(m: Option[List[List[Double]]]) {
 
   def transpose: Matrix = {
     m match {
-      case Some(data) => Matrix(Some(data.transpose))
+      case Some(data) => {
+        if (data.isEmpty || data.head.isEmpty) {
+          Matrix(None)
+        } else {
+          val transposedData = data.head.indices.map { j =>
+            data.map(row => row(j))
+          }.toList
+
+          Matrix(Some(transposedData))
+        }
+      }
       case None => Matrix(None)
     }
   }
