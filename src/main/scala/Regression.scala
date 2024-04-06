@@ -84,7 +84,7 @@ object Regression {
     val (m: Int, n: Int) = get_X_dimensions(X)
 
     // diferentele in modul dintre valoarea reala si ce estimata
-    val Y_abs_diff: Matrix = (Y_estimat - Y).map(el => el.abs / m.toDouble)
+    val Y_abs_diff: Matrix = (Y_estimat - Y).map(el => el.abs)
 
     // valoarea medie a tuturor elementelor matricii
     val err: Double = Y_abs_diff.data.get.flatten.sum / m.toDouble
