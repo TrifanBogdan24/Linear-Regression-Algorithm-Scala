@@ -23,7 +23,8 @@ class Matrix(m: Option[List[List[Double]]]) {
 
   def map(f: Double => Double): Matrix = {
     m match {
-      case Some(data) => Matrix(Some(data.map(_.map(f))))
+      // `.map(el => f(el))` <=> `.map(f)`
+      case Some(data) => Matrix(Some(data.map(row => row.map(el => f(el)))))
       case None => Matrix(None)
     }
   }
@@ -81,10 +82,27 @@ class Matrix(m: Option[List[List[Double]]]) {
 
 
   def data: Option[Mat] = m
-  def height: Option[Int] = m.map(_.length)
-  def width: Option[Int] = m.flatMap(_.headOption.map(_.length))
+
+  def height: Option[Int] = {
+    // metoda simpla: m.map(_.length)
+
+    m match {
+      case Some(matrix) => Some(matrix.length)
+      case None => None
+    }
+  }
+
+  def width: Option[Int] = {
+    // metoda simpla: m.flatMap(_.headOption.map(_.length))
+
+    m match {
+      case Some(matrix) => Some(matrix.head.length)   // `.head` extrage primul element al unei liste
+      case None => None
+    }
+  }
+
   override def toString: String = m match {
-    case Some(data) => data.map(_.mkString(" ")).mkString("\n")
+    case Some(data) => data.map(line => line.mkString(" ")).mkString("\n")
     case None => "Matrix(None)"
   }
 
@@ -101,9 +119,11 @@ class Matrix(m: Option[List[List[Double]]]) {
 
 object Matrix {
   def apply(data: Mat): Matrix = new Matrix(Some(data))
+
   def apply(data: Option[Mat]): Matrix = new Matrix(data)
+
   def apply(dataset: Dataset): Matrix = {
-    val data = dataset.data.tail.map(_.map(_.toDouble)).toList
+    val data = dataset.data.tail.map(row => row.map(el => el.toDouble)).toList
     Matrix(Some(data))
   }
 }

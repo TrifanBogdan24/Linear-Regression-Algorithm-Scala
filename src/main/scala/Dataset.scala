@@ -57,6 +57,7 @@ class Dataset(m: List[List[String]]) {
     )
 
 
+    // `ceil` aproximeaza in sus
     val nrElementsSubSet: Int = (1.0.toDouble / percentage).ceil.toInt
 
     @tailrec
