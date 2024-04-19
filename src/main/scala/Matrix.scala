@@ -1,3 +1,4 @@
+import scala.annotation.tailrec
 import scala.util.Try
 
 type Mat = List[List[Double]]
@@ -142,8 +143,8 @@ class Matrix(m: Option[List[List[Double]]]) {
   }
 
   override def toString: String = m match {
-    case Some(data) => data.map(line => line.mkString(" ")).mkString("\n")
     case None => "Matrix(None)"
+    case Some(mat) => mat.map(row => row.mkString(" ")).mkString("\n") 
   }
 
 
@@ -155,6 +156,32 @@ class Matrix(m: Option[List[List[Double]]]) {
    */
   def getDimensions(): (Int, Int) = (height.getOrElse(0), width.getOrElse(0))
 
+  def getElementsSum(): Double = {
+
+    @tailrec
+    def sumOfLine(line: List[Double], sumAcc: Double): Double = {
+      line match {
+        case Nil => sumAcc
+        case x :: xs => sumOfLine(xs, sumAcc + x)
+      }
+    }
+
+
+    @tailrec
+    def helper(matrix: List[List[Double]], totalSum: Double): Double = {
+      matrix match
+        case Nil => totalSum
+        case x :: xs => helper(xs, totalSum + sumOfLine(x, 0.0))
+    }
+
+
+    m match {
+      case None => 0.0
+      case Some(matrix) => helper(matrix, 0.0)
+    }
+
+  }
+  
 }
 
 object Matrix {
