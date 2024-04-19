@@ -2,32 +2,36 @@ import scala.annotation.tailrec
 import scala.io.Source    // ciitirea din fisier CSV
 
 class Dataset(m: List[List[String]]) {
+
   val data: List[List[String]] = m
+
   override def toString: String = {
     val header = getHeader.mkString(",")
-    val rows = getRows.map(_.mkString(",")).mkString("\n")
+    val rows = getRows.map(row => row.mkString(",")).mkString("\n")
     s"$header\n$rows"
   }
 
 
   def selectColumn(col: String): Dataset =  {
-    val header = getHeader
-    val columnIdx = header.indexOf(col)
+    val header: List[String] = getHeader      // prima linie din tabel (numele coloanelor)
+    val columnIdx: Int = header.indexOf(col)
+
     if (columnIdx != -1) {
-      val newM = m.map(row => List(row(columnIdx)))
+      val newM: List[List[String]] = m.map(row => List(row(columnIdx)))
       new Dataset(newM)
     } else
       throw new Exception(s"Coloana $col nu exista in setul de date.")
   }
 
   def selectColumns(cols: List[String]): Dataset = {
-    val header = getHeader
+    val header: List[String] = getHeader    // prima linie din tabel (numele coloanelor
 
-    val columnIndices = cols.map(col => header.indexOf(col))
+    val columnIndices: List[Int] = cols.map(col => header.indexOf(col))
+
     if (columnIndices.contains(-1)) {
       throw new Exception(s"Err: Una sau mai multe coloane specificate nu exista în setul de date.")
     } else {
-      val newDS = m.map(row => columnIndices.map(index => row(index)))
+      val newDS: List[List[String]] = m.map(row => columnIndices.map(index => row(index)))
       new Dataset(newDS)
     }
   }
@@ -48,18 +52,19 @@ class Dataset(m: List[List[String]]) {
 
     // sortam liniile matricii (mai putin prima)
     val sortedData: List[List[String]] = m.tail.sortBy(
+      // `head` extrage primul element din lista (valorile primei coloane)
       row => row.head      // crescator dupa prima coloana (strcmp)
     )
 
-    
+
     val nrElementsSubSet: Int = (1.0.toDouble / percentage).ceil.toInt
 
     @tailrec
     def splitHelper(inputValues: List[List[String]],
-               trainValues: List[List[String]],
-               evalValues: List[List[String]],
-               k: Int)
-                : (List[List[String]], List[List[String]]) = {
+                    trainValues: List[List[String]],
+                    evalValues: List[List[String]],
+                    k: Int)
+    : (List[List[String]], List[List[String]]) = {
 
       inputValues match {
         case Nil => (trainValues, evalValues)
@@ -100,12 +105,17 @@ class Dataset(m: List[List[String]]) {
 
 object Dataset {
   def apply(csvFilename: String): Dataset = {
+
     val source = Source.fromFile(csvFilename)
+
     try {
       val lines: List[String] = source.getLines().toList
+
       val header: List[String] = lines.head.split(",").toList
       val data: List[List[String]] = lines.tail.map(_.split(",").toList)
+
       new Dataset(header :: data)
+
     } finally {
       source.close()
     }

@@ -32,8 +32,8 @@ object Regression {
    * va returna `W` = coeficientii lui `X` din ecuatia dreptei de regresie
    */
   private def calculate_regression_equation(train_set: Dataset,
-                                      attribute_columns: List[String], value_column: String,
-                                      alpha: Double, gradient_descent_steps: Int): Matrix = {
+                                            attribute_columns: List[String], value_column: String,
+                                            alpha: Double, gradient_descent_steps: Int): Matrix = {
 
     val train_X_set: Dataset = train_set.selectColumns(attribute_columns)
     val train_Y_set: Dataset = train_set.selectColumn(value_column)

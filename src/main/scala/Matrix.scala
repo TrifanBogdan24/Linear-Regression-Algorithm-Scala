@@ -107,3 +107,4 @@ object Matrix {
     Matrix(Some(data))
   }
 }
+
