@@ -23,8 +23,12 @@ class Matrix(m: Option[List[List[Double]]]) {
 
   def map(f: Double => Double): Matrix = {
     m match {
-      // `.map(el => f(el))` <=> `.map(f)`
-      case Some(data) => Matrix(Some(data.map(row => row.map(el => f(el)))))
+      case Some(data) => {
+        // `.map(el => f(el))` <=> `.map(f)`
+        val newMat: List[List[Double]] = data.map(row => row.map(el => f(el)))
+        Matrix(Some(newMat))
+      }
+
       case None => Matrix(None)
     }
   }
@@ -55,27 +59,38 @@ class Matrix(m: Option[List[List[Double]]]) {
    */
   def ++(x: Double): Matrix = {
     m match {
-      case Some(data) =>
-        val newData = data.map(row => row :+ x)
-        Matrix(Some(newData))
       case None => Matrix(None)
+      case Some(data) => {
+        // `list :+ el` adauga o lista la finalul listei
+        val newMat: List[List[Double]] = data.map(row => row :+ x)
+        Matrix(Some(newMat))
+      }
     }
   }
 
+  /**
+   * scade doua matrici (operatia se face element cu element)
+   */
   def -(other: Matrix): Matrix = {
     m match {
-      case Some(mat1) =>
-        other.data match {
-          case Some(mat2) if mat1.size == mat2.size && mat1.headOption.exists(_.size == mat2.headOption.fold(false)(_.size)) =>
-            val result = mat1.zip(mat2).map { case (row1, row2) =>
-              row1.zip(row2).map { case (elem1, elem2) =>
-                elem1 - elem2
-              }
-            }
-            Matrix(Some(result))
-          case _ => Matrix(None)
-        }
       case None => Matrix(None)
+      case Some(mat1) => {
+        other.data match {
+          case Some(mat2) => {
+            if (mat1.size != mat2.size) Matrix(None)                // dimensiune invalida
+            else if (mat1.head.size != mat2.head.size) Matrix(None) // dimensiune invalida
+            else {
+              val result = mat1.zip(mat2).map { case (row1, row2) =>
+                row1.zip(row2).map { case (elem1, elem2) => elem1 - elem2}
+              }
+
+              Matrix(Some(result))
+            }
+          }
+
+          case None => Matrix(None)
+        }
+      }
     }
   }
 
