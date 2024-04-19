@@ -10,11 +10,12 @@ class Matrix(m: Option[List[List[Double]]]) {
         if (data.isEmpty || data.head.isEmpty) {
           Matrix(None)
         } else {
-          val transposedData = data.head.indices.map { j =>
+
+          val tranposedData = data.head.indices.map { j =>
             data.map(row => row(j))
           }.toList
 
-          Matrix(Some(transposedData))
+          Matrix(Some(tranposedData))
         }
       }
       case None => Matrix(None)
@@ -38,18 +39,35 @@ class Matrix(m: Option[List[List[Double]]]) {
    */
   def *(other: Matrix): Matrix = {
     m match {
-      case Some(data1) =>
-        other.data match {
-          case Some(data2) if data1.headOption.exists(_.length == data2.length) =>
-            val result = data1.map(row1 =>
-              data2.transpose.map(col2 =>
-                row1.zip(col2).map { case (a, b) => a * b }.sum
-              )
-            )
-            Matrix(Some(result))
-          case _ => Matrix(None)
-        }
       case None => Matrix(None)
+
+      case Some(mat1) => {
+
+        other.data match {
+          case Some(mat2) => {
+
+            val widthOfMat1: Int = mat1.head.length
+            val heightOfMat2: Int = mat2.length
+
+            if (widthOfMat1 != heightOfMat2) Matrix(None)   // dimenensiuni invalide
+            else {
+
+              // <=> `case Some(mat2) if (mat1.head.length != mat2.length)`
+              val res = mat1.map(row1 =>
+                mat2.transpose.map(col2 =>
+                  row1.zip(col2).map { case (a, b) => a * b }.sum
+                )
+              )
+              Matrix(res)
+            }
+          }
+
+          case None => Matrix(None)
+
+        }
+
+      }
+
     }
   }
 
@@ -74,14 +92,21 @@ class Matrix(m: Option[List[List[Double]]]) {
   def -(other: Matrix): Matrix = {
     m match {
       case None => Matrix(None)
+
       case Some(mat1) => {
         other.data match {
+
           case Some(mat2) => {
-            if (mat1.size != mat2.size) Matrix(None)                // dimensiune invalida
-            else if (mat1.head.size != mat2.head.size) Matrix(None) // dimensiune invalida
+
+            val (height1: Int, width1: Int) = (mat1.length, mat1.head.length)
+            val (height2: Int, width2: Int) = (mat2.length, mat2.head.length)
+
+            if (height1 != height2 || width1 != width2) Matrix(None)  // dimensiune invalida
             else {
-              val result = mat1.zip(mat2).map { case (row1, row2) =>
-                row1.zip(row2).map { case (elem1, elem2) => elem1 - elem2}
+
+              val result = mat1.zip(mat2).map {case (row1, row2) =>
+                row1.zip(row2).map { case (elem1, elem2) => elem1 - elem2
+                }
               }
 
               Matrix(Some(result))
