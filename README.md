@@ -252,6 +252,18 @@ unde `m` este numarul de linii din setul de antrenare.
 
 
 
+### Programarea Functionala
+
+
+Desi algoritmul de regresie liniara este implementat in `Scala`,
+care este este un un limbaj **OOP** (Object-Oriented Programming),
+codul respecta paradigmele de programare ale unui **limbaj functional**:
+- Codul este construit pe baza functiilor
+- Variabilele sunt **imutabile**, odata create, nu mai pot fi modificate
+- Modificarea unei variabile presupune crearea unei noi variabile
+- Se foloseste `Option` (`None`/`Some(x)`) pentru propagarea erorilor
+
+
 ## Plotting
 
 
