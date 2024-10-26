@@ -1,12 +1,5 @@
 #!/usr/bin/env gnuplot
 
-# comenzi de rulat in terminal:
-# sudo apt-get install gnuplot
-# which gnuplot
-# gnuplot --version
-#
-# gnuplot -p plot.plt
-
 A = -0.46562730905168315
 B = 13.606240746925756
 C = 101.46591826674094

@@ -23,7 +23,6 @@ object Regression {
 
 
     val err_val: Double = calculate_avg_err(W, eval_set, attribute_columns, value_column)
-
     (W, err_val)
   }
 
@@ -87,7 +86,7 @@ object Regression {
     val Y_abs_diff: Matrix = (Y_estimat - Y).map(el => el.abs)
 
     // valoarea medie a tuturor elementelor matricii
-    val err: Double = Y_abs_diff.getElementsSum() / m.toDouble
+    val err: Double = Y_abs_diff.data.get.flatten.sum / m.toDouble
     err
   }
 
