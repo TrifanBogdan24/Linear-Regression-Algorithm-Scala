@@ -20,7 +20,8 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: '11'
-          distribution: 'adopt' # Poți alege adopt sau temurin, ambele sunt recomandate
+          # Choose from 'adopt' or 'temurin' (both ar recommended)
+          distribution: 'adopt'
 
       - name: Cache SBT
         uses: actions/cache@v2
