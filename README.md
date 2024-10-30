@@ -315,7 +315,6 @@ $ gnuplot -p plot.plt
 
 
 ## Testare
----
 
 Pentru a testa codul sursa,
 ruleaza in terminal urmatoarea comanda
