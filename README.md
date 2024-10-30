@@ -310,3 +310,17 @@ $ gnuplot -p plot.plt
 
 
 ![img](accurate_3dplot.jpg)
+
+
+
+
+## Testare
+---
+
+Pentru a testa codul sursa,
+ruleaza in terminal urmatoarea comanda
+(in directorul radacina al repository-ul de git):
+
+```sh
+$ sbt test
+```
